@@ -37,8 +37,17 @@
   (q/frame-rate 1)
   {:board (add-glider initial-board)})
 
+(defn step [board]
+  board)
+  ;; (loop [next initial-board
+  ;;        x 0
+  ;;        y 0]
+  ;;   (if (= x y board-size)
+  ;;     next
+  ;;     (recur))))
+
 (defn update-state [state]
-  state)
+  (update state :board step))
 
 (defn draw-state [state]
   (q/no-stroke)
