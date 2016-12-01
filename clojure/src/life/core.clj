@@ -16,13 +16,22 @@
         flat (s/join "\n" (map #(s/join " " %) lines))]
     (println flat)))
 
+(defn pos [[x y]]
+  (+ x (* board-size y)))
+
+(defn get-p [m p]
+  (get m (pos p)))
+
+(defn set-p [m p v]
+  (assoc m (pos p) v))
+
 (defn add-glider [board]
   (-> board
-      (assoc (pos 1 0) 1)
-      (assoc (pos 2 1) 1)
-      (assoc (pos 2 2) 1)
-      (assoc (pos 0 2) 1)
-      (assoc (pos 1 2) 1)))
+      (set-p [1 0] 1)
+      (set-p [2 1] 1)
+      (set-p [2 2] 1)
+      (set-p [0 2] 1)
+      (set-p [1 2] 1)))
 
 (defn setup []
   (q/frame-rate 1)
@@ -31,15 +40,12 @@
 (defn update-state [state]
   state)
 
-(defn pos [x y]
-  (+ x (* board-size y)))
-
 (defn draw-state [state]
   (q/no-stroke)
   (doall
    (for [x (range board-size)
          y (range board-size)]
-     (let [cell (get (:board state) (pos x y))
+     (let [cell (get-p (:board state) [x y])
            color (state->color cell)]
        (apply q/fill color)
        (q/rect (* x cell-size)
