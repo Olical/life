@@ -1,47 +1,57 @@
 (ns life.core
   (:require [quil.core :as q]
-            [quil.middleware :as m]))
+            [quil.middleware :as m]
+            [clojure.string :as s]))
+
+(def cell-size 10)
+(def board-size 30)
+
+(def state->color {0 [255 255 255]
+                   1 [0 0 0]})
+
+(def initial-board (into [] (repeat (* board-size board-size) 0)))
+
+(defn print-board [board]
+  (let [lines (partition board-size board)
+        flat (s/join "\n" (map #(s/join " " %) lines))]
+    (println flat)))
+
+(defn add-glider [board]
+  (-> board
+      (assoc (pos 1 0) 1)
+      (assoc (pos 2 1) 1)
+      (assoc (pos 2 2) 1)
+      (assoc (pos 0 2) 1)
+      (assoc (pos 1 2) 1)))
 
 (defn setup []
-  ; Set frame rate to 30 frames per second.
-  (q/frame-rate 30)
-  ; Set color mode to HSB (HSV) instead of default RGB.
-  (q/color-mode :hsb)
-  ; setup function returns initial state. It contains
-  ; circle color and position.
-  {:color 0
-   :angle 0})
+  (q/frame-rate 1)
+  {:board (add-glider initial-board)})
 
 (defn update-state [state]
-  ; Update sketch state by changing circle color and position.
-  {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.1)})
+  state)
+
+(defn pos [x y]
+  (+ x (* board-size y)))
 
 (defn draw-state [state]
-  ; Clear the sketch by filling it with light-grey color.
-  (q/background 240)
-  ; Set circle color.
-  (q/fill (:color state) 255 255)
-  ; Calculate x and y coordinates of the circle.
-  (let [angle (:angle state)
-        x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))]
-    ; Move origin point to the center of the sketch.
-    (q/with-translation [(/ (q/width) 2)
-                         (/ (q/height) 2)]
-      ; Draw the circle.
-      (q/ellipse x y 100 100))))
+  (q/no-stroke)
+  (doall
+   (for [x (range board-size)
+         y (range board-size)]
+     (let [cell (get (:board state) (pos x y))
+           color (state->color cell)]
+       (apply q/fill color)
+       (q/rect (* x cell-size)
+               (* y cell-size)
+               cell-size
+               cell-size)))))
 
 (q/defsketch life
-  :title "You spin my circle right round"
-  :size [500 500]
-  ; setup function called only once, during sketch initialization.
+  :title "Game of life"
+  :size (let [size (* board-size cell-size)] [size size])
   :setup setup
-  ; update-state is called on each iteration before draw-state.
   :update update-state
   :draw draw-state
   :features [:keep-on-top]
-  ; This sketch uses functional-mode middleware.
-  ; Check quil wiki for more info about middlewares and particularly
-  ; fun-mode.
   :middleware [m/fun-mode])
