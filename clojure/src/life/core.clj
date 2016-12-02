@@ -48,9 +48,15 @@
      0
      offsets)))
 
+(defn key-pressed [state event]
+  (case (event :key-code)
+    32 (update state :paused not)
+    state))
+
 (defn setup []
   (q/frame-rate 10)
-  {:board (add-glider initial-board)})
+  {:board (add-glider initial-board)
+   :paused false})
 
 ;; Any live cell with fewer than two live neighbours dies, as if caused by under-population.
 ;; Any live cell with two or three live neighbours lives on to the next generation.
@@ -74,7 +80,9 @@
     board)))
 
 (defn update-state [state]
-  (update state :board step))
+  (if (:paused state)
+    state
+    (update state :board step)))
 
 (defn draw-state [state]
   (q/no-stroke)
@@ -95,5 +103,6 @@
   :setup setup
   :update update-state
   :draw draw-state
+  :key-pressed key-pressed
   :features [:keep-on-top]
   :middleware [m/fun-mode])
