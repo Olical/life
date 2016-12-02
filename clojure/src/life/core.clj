@@ -11,6 +11,11 @@
 
 (def initial-board (into [] (repeat (* board-size board-size) 0)))
 
+(defn random-board []
+  (into
+   []
+   (take (* board-size board-size) (repeatedly #(Math/round (rand))))))
+
 (defn print-board [board]
   (let [lines (partition board-size board)
         flat (s/join "\n" (map #(s/join " " %) lines))]
@@ -50,7 +55,8 @@
 
 (defn key-pressed [state event]
   (case (event :key-code)
-    32 (update state :paused not)
+    32 (update state :paused not) ;; space
+    82 (assoc state :board (random-board)) ;; r
     state))
 
 (def flip-life {0 1 1 0})
