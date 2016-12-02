@@ -16,14 +16,19 @@
         flat (s/join "\n" (map #(s/join " " %) lines))]
     (println flat)))
 
-(defn pos [[x y]]
-  (+ x (* board-size y)))
+(defn p2->1 [[x y]]
+  (+ (mod x board-size)
+     (* board-size (mod y board-size))))
+
+(defn p1->2 [n]
+  [(mod (mod n board-size) board-size)
+   (mod (quot n board-size) board-size)])
 
 (defn get-p [m p]
-  (get m (pos p)))
+  (get m (p2->1 p)))
 
 (defn set-p [m p v]
-  (assoc m (pos p) v))
+  (assoc m (p2->1 p) v))
 
 (defn add-glider [board]
   (-> board
@@ -33,18 +38,40 @@
       (set-p [0 2] 1)
       (set-p [1 2] 1)))
 
+(defn alive-neighbours [board [x y]]
+  (let [offsets [[-1 -1] [0 -1] [1 -1]
+                 [-1 0]         [1 0]
+                 [-1 1]  [0 1]  [1 1]]]
+    (reduce
+     (fn [alive [ox oy]]
+       (if (= 1 (get-p board [(+ x ox) (+ y oy)])) (inc alive) alive))
+     0
+     offsets)))
+
 (defn setup []
-  (q/frame-rate 1)
+  (q/frame-rate 10)
   {:board (add-glider initial-board)})
 
+;; Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+;; Any live cell with two or three live neighbours lives on to the next generation.
+;; Any live cell with more than three live neighbours dies, as if by over-population.
+;; Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
 (defn step [board]
-  board)
-  ;; (loop [next initial-board
-  ;;        x 0
-  ;;        y 0]
-  ;;   (if (= x y board-size)
-  ;;     next
-  ;;     (recur))))
+  (into
+   []
+   (map-indexed
+    (fn [n state]
+      (let [pos (p1->2 n)
+            neighbours (alive-neighbours board pos)
+            alive? (= 1 state)]
+        (cond
+          (and alive? (< neighbours 2)) 0
+          (and alive? (> neighbours 3)) 0
+          (and alive? (or (= 2 neighbours) (= 3 neighbours))) 1
+          (and (not alive?) (= 3 neighbours)) 1
+          :else state)))
+    board)))
 
 (defn update-state [state]
   (update state :board step))
