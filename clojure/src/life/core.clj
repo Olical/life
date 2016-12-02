@@ -53,6 +53,15 @@
     32 (update state :paused not)
     state))
 
+(def flip-life {0 1 1 0})
+
+(defn mouse-clicked [state event]
+  (if (= :left (:button event))
+    (let [x (quot (:x event) cell-size)
+          y (quot (:y event) cell-size)]
+      (update-in state [:board (p2->1 [x y])] flip-life))
+    state))
+
 (defn setup []
   (q/frame-rate 10)
   (q/text-font (q/create-font "Sans Serif" 28 true))
@@ -112,5 +121,6 @@
   :update update-state
   :draw draw-state
   :key-pressed key-pressed
+  :mouse-clicked mouse-clicked
   :features [:keep-on-top]
   :middleware [m/fun-mode])
