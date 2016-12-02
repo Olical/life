@@ -118,7 +118,6 @@
    (q/rect 0 0 130 40)
    (q/fill 255 255 255)
    (q/text "PAUSED" 8 29)))
-  
 
 (q/defsketch life
   :title "Game of life"
@@ -130,3 +129,6 @@
   :mouse-clicked mouse-clicked
   :features [:keep-on-top]
   :middleware [m/fun-mode])
+
+(defn -main []
+  (println "Booted!?"))
