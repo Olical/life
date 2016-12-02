@@ -4,7 +4,7 @@
             [clojure.string :as s]))
 
 (def cell-size 10)
-(def board-size 30)
+(def board-size 100)
 
 (def state->color {0 [255 255 255]
                    1 [0 0 0]})
@@ -55,6 +55,7 @@
 
 (defn setup []
   (q/frame-rate 10)
+  (q/text-font (q/create-font "Sans Serif" 28 true))
   {:board (add-glider initial-board)
    :paused false})
 
@@ -85,7 +86,7 @@
     (update state :board step)))
 
 (defn draw-state [state]
-  (q/no-stroke)
+  (q/stroke 200 200 200)
   (doall
    (for [x (range board-size)
          y (range board-size)]
@@ -95,7 +96,14 @@
        (q/rect (* x cell-size)
                (* y cell-size)
                cell-size
-               cell-size)))))
+               cell-size))))
+  (when (:paused state)
+   (q/no-stroke)
+   (q/fill 0 0 0 150)
+   (q/rect 0 0 130 40)
+   (q/fill 255 255 255)
+   (q/text "PAUSED" 8 29)))
+  
 
 (q/defsketch life
   :title "Game of life"
