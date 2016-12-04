@@ -119,16 +119,17 @@
    (q/fill 255 255 255)
    (q/text "PAUSED" 8 29)))
 
-(q/defsketch life
-  :title "Game of life"
-  :size (let [size (* board-size cell-size)] [size size])
-  :setup setup
-  :update update-state
-  :draw draw-state
-  :key-pressed key-pressed
-  :mouse-clicked mouse-clicked
-  :features [:keep-on-top]
-  :middleware [m/fun-mode])
+(defn start []
+  (q/defsketch life
+    :title "Game of life"
+    :size (let [size (* board-size cell-size)] [size size])
+    :setup setup
+    :update update-state
+    :draw draw-state
+    :key-pressed key-pressed
+    :mouse-clicked mouse-clicked
+    :features [:keep-on-top]
+    :middleware [m/fun-mode]))
 
 (defn -main []
-  (println "Booted!?"))
+  (start))
