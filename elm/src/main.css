@@ -1,3 +1,19 @@
 body {
   margin: 0;
 }
+
+.world-row {
+  display: inline-block;
+}
+
+.cell {
+  width: 10px;
+  height: 10px;
+  border: 1px solid #DDDDDD;
+  border-top: none;
+  border-left: none;
+}
+
+.cell-alive {
+  background-color: #000000;
+}
