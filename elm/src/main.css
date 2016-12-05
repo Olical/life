@@ -3,7 +3,7 @@ body {
 }
 
 .world-row {
-  display: inline-block;
+  float: left;
 }
 
 .cell {
@@ -12,6 +12,7 @@ body {
   border: 1px solid #DDDDDD;
   border-top: none;
   border-left: none;
+  float: left;
 }
 
 .cell-alive {
