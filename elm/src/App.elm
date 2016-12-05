@@ -6,18 +6,16 @@ import Html.Attributes exposing (class, classList)
 import Time exposing (Time, second)
 
 
-cellSize =
-    10
-
-
 worldSize =
     50
 
 
-type alias World = Array (Array Bool)
+type alias World =
+    Array (Array Bool)
 
 
-type alias WorldPos = (Int, Int)
+type alias WorldPos =
+    ( Int, Int )
 
 
 type alias Model =
@@ -28,10 +26,11 @@ type alias Model =
 init : ( Model, Cmd Msg )
 init =
     let
-        emptyWorld = Array.repeat worldSize (Array.repeat worldSize False)
+        emptyWorld =
+            Array.repeat worldSize (Array.repeat worldSize False)
     in
         ( { world = addGlider emptyWorld
-        }
+          }
         , Cmd.none
         )
 
@@ -41,29 +40,41 @@ type Msg
 
 
 setCell : WorldPos -> Bool -> World -> World
-setCell (ix, iy) state world =
+setCell ( ix, iy ) state world =
     let
-        x = ix % worldSize
-        y = iy % worldSize
-        row = Array.get y world
+        x =
+            ix % worldSize
+
+        y =
+            iy % worldSize
+
+        row =
+            Array.get y world
     in
         case row of
             Nothing ->
                 world
+
             Just row ->
                 Array.set y (Array.set x state row) world
 
 
 getCell : WorldPos -> World -> Maybe Bool
-getCell (ix, iy) world =
+getCell ( ix, iy ) world =
     let
-        x = ix % worldSize
-        y = iy % worldSize
-        row = Array.get x world
+        x =
+            ix % worldSize
+
+        y =
+            iy % worldSize
+
+        row =
+            Array.get x world
     in
         case row of
             Nothing ->
                 Nothing
+
             Just row ->
                 Array.get y row
 
@@ -71,17 +82,17 @@ getCell (ix, iy) world =
 addGlider : World -> World
 addGlider world =
     world
-        |> setCell (1, 0) True
-        |> setCell (2, 1) True
-        |> setCell (0, 2) True
-        |> setCell (1, 2) True
-        |> setCell (2, 2) True
+        |> setCell ( 1, 0 ) True
+        |> setCell ( 2, 1 ) True
+        |> setCell ( 0, 2 ) True
+        |> setCell ( 1, 2 ) True
+        |> setCell ( 2, 2 ) True
 
 
 stepWorld : World -> World
 stepWorld world =
     world
-                    
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
