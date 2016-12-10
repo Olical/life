@@ -86,9 +86,45 @@ addGlider world =
         |> setCell ( 2, 2 ) True
 
 
+
+-- Any live cell with fewer than two live neighbours dies, as if caused by under-population.
+-- Any live cell with two or three live neighbours lives on to the next generation.
+-- Any live cell with more than three live neighbours dies, as if by over-population.
+-- Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+
+
+shouldLive : WorldPos -> Bool -> World -> Bool
+shouldLive pos life world =
+    let
+        lns =
+            neighbours pos world
+    in
+        if life then
+            if lns < 2 then
+                False
+            else if (lns == 2 || lns == 3) then
+                True
+            else if lns > 3 then
+                False
+            else
+                False
+        else if lns == 3 then
+            True
+        else
+            False
+
+
 stepWorld : World -> World
 stepWorld world =
-    world
+    Array.indexedMap
+        (\y row ->
+            Array.indexedMap
+                (\x life ->
+                    shouldLive ( x, y ) life world
+                )
+                row
+        )
+        world
 
 
 neighbours : WorldPos -> World -> Int
