@@ -1,7 +1,7 @@
 module App exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, text, div)
+import Html exposing (Html, text, div, p)
 import Html.Attributes exposing (class, classList)
 import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
@@ -70,8 +70,8 @@ getCell ( ix, iy ) world =
             iy % worldSize
 
         life =
-            Array.get x world
-                |> andThen (Array.get y)
+            Array.get y world
+                |> andThen (Array.get x)
     in
         withDefault False life
 
@@ -105,7 +105,15 @@ neighbours ( x, y ) world =
             , ( 1, 1 )
             ]
     in
-        1
+        List.foldl
+            (\( ox, oy ) acc ->
+                if getCell ( x + ox, y + oy ) world then
+                    acc + 1
+                else
+                    acc
+            )
+            0
+            offsets
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
