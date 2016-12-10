@@ -1,7 +1,7 @@
 module App exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, text, div, p)
+import Html exposing (Html, text, div)
 import Html.Attributes exposing (class, classList)
 import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
