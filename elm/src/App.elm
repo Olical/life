@@ -4,6 +4,7 @@ import Array exposing (Array)
 import Html exposing (Html, text, div)
 import Html.Attributes exposing (class, classList)
 import Time exposing (Time, second)
+import Maybe exposing (andThen, withDefault)
 
 
 worldSize =
@@ -59,7 +60,7 @@ setCell ( ix, iy ) state world =
                 Array.set y (Array.set x state row) world
 
 
-getCell : WorldPos -> World -> Maybe Bool
+getCell : WorldPos -> World -> Bool
 getCell ( ix, iy ) world =
     let
         x =
@@ -68,15 +69,11 @@ getCell ( ix, iy ) world =
         y =
             iy % worldSize
 
-        row =
+        life =
             Array.get x world
+                |> andThen (Array.get y)
     in
-        case row of
-            Nothing ->
-                Nothing
-
-            Just row ->
-                Array.get y row
+        withDefault False life
 
 
 addGlider : World -> World
@@ -92,6 +89,23 @@ addGlider world =
 stepWorld : World -> World
 stepWorld world =
     world
+
+
+neighbours : WorldPos -> World -> Int
+neighbours ( x, y ) world =
+    let
+        offsets =
+            [ ( -1, -1 )
+            , ( 0, -1 )
+            , ( 1, -1 )
+            , ( -1, 0 )
+            , ( 1, 0 )
+            , ( -1, 1 )
+            , ( 0, 1 )
+            , ( 1, 1 )
+            ]
+    in
+        1
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
