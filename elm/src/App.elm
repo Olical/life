@@ -197,7 +197,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [ class "world" ]
-              (Array.toList (Array.indexedMap renderWorldRow model.world))
+            (Array.toList (Array.indexedMap renderWorldRow model.world))
         , pausedLabel model.paused
         ]
 
@@ -216,7 +216,7 @@ pausedLabel paused =
 renderWorldRow : Int -> Array Bool -> Html Msg
 renderWorldRow y lives =
     div [ class "world-row" ]
-        (Array.toList (Array.indexedMap (\x life -> renderLife (x, y) life) lives))
+        (Array.toList (Array.indexedMap (\x life -> renderLife ( x, y ) life) lives))
 
 
 renderLife : WorldPos -> Bool -> Html Msg
