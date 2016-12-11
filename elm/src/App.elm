@@ -3,6 +3,7 @@ module App exposing (..)
 import Array exposing (Array)
 import Html exposing (Html, text, div, p)
 import Html.Attributes exposing (class, classList)
+import Html.Events exposing (onClick)
 import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
 import Keyboard
@@ -40,9 +41,15 @@ init =
         )
 
 
+randomWorld : World
+randomWorld =
+    Array.initialize worldSize (\_ -> Array.initialize worldSize (\_ -> False))
+
+
 type Msg
     = Tick Time
     | KeyPress Keyboard.KeyCode
+    | ToggleLife WorldPos
 
 
 setCell : WorldPos -> Bool -> World -> World
@@ -167,13 +174,30 @@ update msg model =
                 ( { model | world = stepWorld model.world }, Cmd.none )
 
         KeyPress key ->
-            ( { model | paused = not model.paused }, Cmd.none )
+            case key of
+                32 ->
+                    ( { model | paused = not model.paused }, Cmd.none )
+
+                114 ->
+                    ( { model | world = randomWorld }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ToggleLife pos ->
+            ( { model
+                | world =
+                    setCell pos (not (getCell pos model.world)) model.world
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ div [ class "world" ] (Array.toList (Array.map renderWorldRow model.world))
+        [ div [ class "world" ]
+              (Array.toList (Array.indexedMap renderWorldRow model.world))
         , pausedLabel model.paused
         ]
 
@@ -189,19 +213,21 @@ pausedLabel paused =
         [ text "paused" ]
 
 
-renderWorldRow : Array Bool -> Html Msg
-renderWorldRow lives =
-    div [ class "world-row" ] (Array.toList (Array.map renderLife lives))
+renderWorldRow : Int -> Array Bool -> Html Msg
+renderWorldRow y lives =
+    div [ class "world-row" ]
+        (Array.toList (Array.indexedMap (\x life -> renderLife (x, y) life) lives))
 
 
-renderLife : Bool -> Html Msg
-renderLife life =
+renderLife : WorldPos -> Bool -> Html Msg
+renderLife pos life =
     div
         [ classList
             [ ( "cell", True )
             , ( "cell-alive", life == True )
             , ( "cell-dead", life == False )
             ]
+        , onClick (ToggleLife pos)
         ]
         []
 
