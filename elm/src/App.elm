@@ -46,7 +46,11 @@ init =
 
 randomWorld : Random.Seed -> World
 randomWorld seed =
-    Array.repeat worldSize (Array.repeat worldSize False)
+    let
+        empty =
+            Array.repeat worldSize (Array.repeat worldSize False)
+    in
+        empty
 
 
 type Msg
