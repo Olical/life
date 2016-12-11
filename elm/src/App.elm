@@ -7,6 +7,7 @@ import Html.Events exposing (onClick)
 import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
 import Keyboard
+import Random
 
 
 worldSize : Int
@@ -25,6 +26,7 @@ type alias WorldPos =
 type alias Model =
     { world : World
     , paused : Bool
+    , time : Time
     }
 
 
@@ -36,14 +38,15 @@ init =
     in
         ( { world = addGlider emptyWorld
           , paused = False
+          , time = 0
           }
         , Cmd.none
         )
 
 
-randomWorld : World
-randomWorld =
-    Array.initialize worldSize (\_ -> Array.initialize worldSize (\_ -> False))
+randomWorld : Random.Seed -> World
+randomWorld seed =
+    Array.repeat worldSize (Array.repeat worldSize False)
 
 
 type Msg
@@ -167,11 +170,11 @@ neighbours ( x, y ) world =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Tick _ ->
+        Tick time ->
             if model.paused then
-                ( model, Cmd.none )
+                ( { model | time = time }, Cmd.none )
             else
-                ( { model | world = stepWorld model.world }, Cmd.none )
+                ( { model | world = stepWorld model.world, time = time }, Cmd.none )
 
         KeyPress key ->
             case key of
@@ -179,7 +182,7 @@ update msg model =
                     ( { model | paused = not model.paused }, Cmd.none )
 
                 114 ->
-                    ( { model | world = randomWorld }, Cmd.none )
+                    ( { model | world = randomWorld (Random.initialSeed (round model.time)) }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
