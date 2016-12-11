@@ -1,12 +1,14 @@
 module App exposing (..)
 
 import Array exposing (Array)
-import Html exposing (Html, text, div)
+import Html exposing (Html, text, div, p)
 import Html.Attributes exposing (class, classList)
 import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
+import Keyboard
 
 
+worldSize : Int
 worldSize =
     50
 
@@ -21,6 +23,7 @@ type alias WorldPos =
 
 type alias Model =
     { world : World
+    , paused : Bool
     }
 
 
@@ -31,6 +34,7 @@ init =
             Array.repeat worldSize (Array.repeat worldSize False)
     in
         ( { world = addGlider emptyWorld
+          , paused = False
           }
         , Cmd.none
         )
@@ -38,6 +42,7 @@ init =
 
 type Msg
     = Tick Time
+    | KeyPress Keyboard.KeyCode
 
 
 setCell : WorldPos -> Bool -> World -> World
@@ -156,7 +161,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Tick _ ->
-            ( { model | world = stepWorld model.world }, Cmd.none )
+            if model.paused then
+                ( model, Cmd.none )
+            else
+                ( { model | world = stepWorld model.world }, Cmd.none )
+        KeyPress key ->
+            ( { model | paused = not model.paused }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -183,4 +193,7 @@ renderLife life =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every second Tick
+    Sub.batch
+        [ Time.every (second / 10) Tick
+        , Keyboard.presses KeyPress
+        ]
