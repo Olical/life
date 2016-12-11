@@ -177,13 +177,16 @@ view model =
         , pausedLabel model.paused
         ]
 
+
 pausedLabel : Bool -> Html Msg
 pausedLabel paused =
-    p [ classList
+    p
+        [ classList
             [ ( "paused", paused )
             , ( "playing", not paused )
             ]
-      ] [ text "paused" ]
+        ]
+        [ text "paused" ]
 
 
 renderWorldRow : Array Bool -> Html Msg
