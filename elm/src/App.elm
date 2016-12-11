@@ -165,13 +165,25 @@ update msg model =
                 ( model, Cmd.none )
             else
                 ( { model | world = stepWorld model.world }, Cmd.none )
+
         KeyPress key ->
             ( { model | paused = not model.paused }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    div [ class "world" ] (Array.toList (Array.map renderWorldRow model.world))
+    div []
+        [ div [ class "world" ] (Array.toList (Array.map renderWorldRow model.world))
+        , pausedLabel model.paused
+        ]
+
+pausedLabel : Bool -> Html Msg
+pausedLabel paused =
+    p [ classList
+            [ ( "paused", paused )
+            , ( "playing", not paused )
+            ]
+      ] [ text "paused" ]
 
 
 renderWorldRow : Array Bool -> Html Msg
