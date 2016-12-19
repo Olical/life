@@ -8,11 +8,7 @@ import Time exposing (Time, second)
 import Maybe exposing (andThen, withDefault)
 import Keyboard
 import Random
-
-
-worldSize : Int
-worldSize =
-    50
+import Tuple
 
 
 type alias World =
@@ -30,27 +26,45 @@ type alias Model =
     }
 
 
+worldSize : Int
+worldSize =
+    50
+
+
+emptyWorld : World
+emptyWorld =
+    Array.repeat worldSize (Array.repeat worldSize False)
+
+
 init : ( Model, Cmd Msg )
 init =
-    let
-        emptyWorld =
-            Array.repeat worldSize (Array.repeat worldSize False)
-    in
-        ( { world = addGlider emptyWorld
-          , paused = False
-          , time = 0
-          }
-        , Cmd.none
-        )
+    ( { world = addGlider emptyWorld
+      , paused = False
+      , time = 0
+      }
+    , Cmd.none
+    )
 
 
 randomWorld : Random.Seed -> World
 randomWorld seed =
     let
-        empty =
-            Array.repeat worldSize (Array.repeat worldSize False)
+        rows =
+            Array.fromList (List.range 0 worldSize)
+
+        world =
+            Array.foldl
+                (\n ( acc, seed ) ->
+                    let
+                        ( row, nextSeed ) =
+                            Random.step (Random.list worldSize Random.bool) seed
+                    in
+                        ( Array.set n (Array.fromList row) acc, nextSeed )
+                )
+                ( emptyWorld, seed )
+                rows
     in
-        empty
+        Tuple.first world
 
 
 type Msg
