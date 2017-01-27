@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset='utf-8'>
+    <style type="text/css">
+     .cells, .cell {
+         border: 1px solid rgba(0, 0, 0, 0.2);
+     }
+
+     .cells {
+         width: 500px;
+         height: 500px;
+         border-top: 0;
+         border-left: 0;
+     }
+
+     .cell {
+         width: 10px;
+         height: 10px;
+         float: left;
+         border-right: 0;
+         border-bottom: 0;
+         box-sizing: border-box;
+     }
+
+     .cell-alive {
+         background-color: #000000;
+     }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="js/compiled/app.js"></script>
+    <script>life.core.init();</script>
+  </body>
+</html>
